@@ -1,4 +1,4 @@
-﻿# repo-maintainer
+# repo-maintainer
 
 Agent skill for systematic GitHub repository cleanup, consolidation, and maintenance.
 
@@ -17,24 +17,29 @@ This skill provides a complete workflow for:
 
 `
 repo-maintainer/
-├── SKILL.md                        # Core workflow and decision trees
+├── LICENSE                         # MIT
+├── README.md                        # This file
+├── SKILL.md                         # Core workflow and decision trees
 └── scripts/
-    ├── repo_analyzer.py            # Analyze repos and generate cleanup report
-    └── bulk_file_updater.py        # Batch update LICENSE, .gitignore, README
+    ├── repo_analyzer.py             # Analyze repos and generate cleanup report
+    └── bulk_file_updater.py         # Batch update LICENSE, .gitignore, README
 `
 
-## Usage
+## Installation
 
-Place this folder in your Agent skills directory:
+Place this folder in your agent skills directory:
 - Windows: ~/.kimi/skills/repo-maintainer/
 - Linux/macOS: ~/.config/agents/skills/repo-maintainer/
 
-Trigger phrases include:
+## Trigger Phrases
+
 - "整理我的 GitHub 仓库"
 - "统一所有仓库的 README"
 - "合并相关仓库"
 - "归档旧项目"
 - "大重构后怎么传回远程"
+- "repo cleanup"
+- "仓库维护"
 
 ## License
 
