@@ -1,6 +1,6 @@
 ---
 name: repo-maintainer
-description: Organize, consolidate, and professionalize GitHub repositories and local codebases. Use when the user asks to clean up GitHub repos, organize repositories, merge related repos, archive outdated projects, standardize README/LICENSE/.gitignore across repos, rename repositories, restructure code, or improve repo professionalism. Covers remote GitHub operations via API and local code refactoring. Triggers on phrases like "整理github仓库", "整理代码", "合并仓库", "归档项目", "统一README", "仓库重命名", "repo cleanup".
+description: Organize, consolidate, and professionalize GitHub repositories and local codebases. Use when the user asks to clean up GitHub repos, organize repositories, merge related repos, archive outdated projects, standardize README/LICENSE/.gitignore across repos, rename repositories, restructure code, or improve repo professionalism. Covers remote GitHub operations via API and local code refactoring. Triggers on phrases like "æ•´ç†githubä»“åº“", "æ•´ç†ä»£ç ", "åˆå¹¶ä»“åº“", "å½’æ¡£é¡¹ç›®", "ç»Ÿä¸€README", "ä»“åº“é‡å‘½å", "repo cleanup".
 ---
 
 # Repository Maintainer
@@ -10,6 +10,19 @@ Systematic workflow for transforming fragmented GitHub profiles into clean, main
 ## Overview
 
 Execute cleanup in 6 phases. Skip phases not applicable. Always get user confirmation on destructive actions (deletion, renaming, merging).
+
+## Core Principles (Non-Negotiable)
+
+Every repository â€” new or old, active or archived â€” must have these four foundation documents. **Do not consider a cleanup complete until all four are verified.**
+
+| Document | Rule | Why |
+|----------|------|-----|
+| **LICENSE** | Every public repo gets a LICENSE. Default to MIT unless user specifies otherwise. | Without a license, code is "all rights reserved" by default. Nobody can legally use it. |
+| **README.md** | Must exist with at least: project name, one-sentence description, and usage/install instructions if applicable. | The first thing every visitor sees. An empty or missing README signals abandonment. |
+| **.gitignore** | Must match the primary language (Python/PHP/Node/etc.). Never commit build artifacts, cache, env files, or IDE configs. | Prevents accidental leakage of secrets and keeps diffs readable. |
+| **GitHub Description** | The `description` field must never be empty. One sentence, plain English (or matching repo language). | Appears in search results, profile pins, and social cards. |
+
+**If a repo is missing any of the four, fixing it takes priority over merging, renaming, or refactoring.**
 
 ## Phase 1: Scan & Diagnose
 
@@ -39,7 +52,7 @@ For every active repo, ensure minimum file set exists:
 
 Bulk update via GitHub Contents API (PUT `/repos/{owner}/{repo}/contents/{path}`).
 
-**Critical: PowerShell here-strings corrupt triple-backtick code blocks in Markdown.** Use Python scripts for bulk README generation to avoid `` ` `` → ` ``` ` escaping failures.
+**Critical: PowerShell here-strings corrupt triple-backtick code blocks in Markdown.** Use Python scripts for bulk README generation to avoid `` ` `` â†’ ` ``` ` escaping failures.
 
 ## Phase 3: Handle Outdated Repos
 
@@ -58,22 +71,22 @@ Archived repos are read-only. To modify an archived repo (rename, update README)
 
 When 2+ repos are variants of the same system (different backends, engines, adapters):
 
-**Option A — Monorepo (Recommended)**
+**Option A â€” Monorepo (Recommended)**
 Create a new clean repo (no history). Place each variant in `engines/{name}/` subdirectory.
 ```
 project-suite/
-├── main.py              # default engine
-├── engines/
-│   ├── babeldoc/
-│   └── mineru/
-└── README.md
+â”œâ”€â”€ main.py              # default engine
+â”œâ”€â”€ engines/
+â”‚   â”œâ”€â”€ babeldoc/
+â”‚   â””â”€â”€ mineru/
+â””â”€â”€ README.md
 ```
 Preserve each engine's entry point and config. Update root README to explain switching.
 
-**Option B — Git Submodule**
+**Option B â€” Git Submodule**
 Keep repos independent. Add submodules in parent. Use when history preservation matters more than simplicity.
 
-**Option C — Keep Independent + Link**
+**Option C â€” Keep Independent + Link**
 Do not merge. Add cross-links in READMEs. Use when variants have diverged significantly.
 
 **If history contains secrets**: Always create a new clean repo and copy current snapshot (via zip download + re-commit). Do not use `git merge` or `git submodule` as history leaks will persist.
@@ -94,9 +107,9 @@ GitHub automatically redirects old URLs for a period, but bookmarks and scripts 
 
 After remote structure is clean, refactor code inside repos:
 
-1. **Unified terminology** — Replace hardcoded brand names with generic terms (`GPTProcessor` → `LLMProcessor`) while preserving actual API model IDs (`gpt-4`, `gpt-5`).
-2. **File renaming** — GitHub Contents API has no rename; create new file with updated content, delete old file.
-3. **Directory reorganization** — Use `engines/`, `variants/`, or `core/` + `adapters/` patterns for multi-flavor projects.
+1. **Unified terminology** â€” Replace hardcoded brand names with generic terms (`GPTProcessor` â†’ `LLMProcessor`) while preserving actual API model IDs (`gpt-4`, `gpt-5`).
+2. **File renaming** â€” GitHub Contents API has no rename; create new file with updated content, delete old file.
+3. **Directory reorganization** â€” Use `engines/`, `variants/`, or `core/` + `adapters/` patterns for multi-flavor projects.
 
 ## Pushing Large Local Refactors to Remote
 
@@ -107,7 +120,7 @@ When the user downloads code locally, makes heavy changes (file renames, variabl
 | Situation | Recommended Action |
 |-----------|-------------------|
 | Local repo has **no `.git`** (downloaded zip / copied files) | See **Scenario A** below |
-| Local is `git clone` with history, remote **unchanged** | Normal `git add → commit → push` |
+| Local is `git clone` with history, remote **unchanged** | Normal `git add â†’ commit â†’ push` |
 | Local is `git clone`, remote has new commits | `git pull --rebase` or merge, resolve conflicts, push |
 | Local is `git clone`, changes are massive renames + rewrites | See **Scenario B** below |
 | Want to preserve remote history but replace all code | See **Scenario C** below |
@@ -116,7 +129,7 @@ When the user downloads code locally, makes heavy changes (file renames, variabl
 
 Most common when user downloads zip, edits extensively, then wants to sync back.
 
-**Option A1 — Force Push (Personal / Solo Projects)**
+**Option A1 â€” Force Push (Personal / Solo Projects)**
 ```bash
 # In local project folder
 git init
@@ -126,9 +139,9 @@ git remote add origin https://github.com/OWNER/REPO.git
 git branch -M main
 git push -u origin main --force
 ```
-⚠️ Destroys remote history. Only use when user confirms remote history is disposable.
+âš ï¸ Destroys remote history. Only use when user confirms remote history is disposable.
 
-**Option A2 — Preserve Remote History (Recommended for Valuable Repos)**
+**Option A2 â€” Preserve Remote History (Recommended for Valuable Repos)**
 ```bash
 git clone https://github.com/OWNER/REPO.git temp-repo
 cp -r temp-repo/.git ./your-local-project/
@@ -139,7 +152,7 @@ git push
 ```
 This keeps all prior commits and appends the refactor as a single new commit.
 
-**Option A3 — New Clean Repo**
+**Option A3 â€” New Clean Repo**
 If the rewrite is so radical it is essentially a new project:
 1. Create new repo on GitHub
 2. Push local code there
@@ -262,5 +275,5 @@ curl -sL "https://github.com/{owner}/{repo}/archive/refs/heads/main.zip" -o {rep
 
 ## Bundled Resources
 
-- `scripts/repo_analyzer.py` — Scan user's GitHub repos and generate cleanup recommendations
-- `scripts/bulk_file_updater.py` — Batch create/update LICENSE, .gitignore, README via GitHub API
+- `scripts/repo_analyzer.py` â€” Scan user's GitHub repos and generate cleanup recommendations
+- `scripts/bulk_file_updater.py` â€” Batch create/update LICENSE, .gitignore, README via GitHub API
