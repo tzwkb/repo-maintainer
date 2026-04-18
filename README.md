@@ -1,4 +1,4 @@
-# repo-maintainer
+﻿# repo-maintainer
 
 Agent skill for systematic GitHub repository cleanup, consolidation, and maintenance.
 
@@ -15,15 +15,15 @@ This skill provides a complete workflow for:
 
 ## Structure
 
-`
+```
 repo-maintainer/
 ├── LICENSE                         # MIT
-├── README.md                        # This file
-├── SKILL.md                         # Core workflow and decision trees
+├── README.md                       # This file
+├── SKILL.md                        # Core workflow and decision trees
 └── scripts/
-    ├── repo_analyzer.py             # Analyze repos and generate cleanup report
-    └── bulk_file_updater.py         # Batch update LICENSE, .gitignore, README
-`
+    ├── repo_analyzer.py            # Analyze repos and generate cleanup report
+    └── bulk_file_updater.py        # Batch update LICENSE, .gitignore, README
+```
 
 ## Installation
 
