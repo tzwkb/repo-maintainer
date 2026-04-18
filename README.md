@@ -1,6 +1,6 @@
 ﻿# repo-maintainer
 
-Kimi Skill for systematic GitHub repository cleanup, consolidation, and maintenance.
+Agent skill for systematic GitHub repository cleanup, consolidation, and maintenance.
 
 ## What It Does
 
@@ -25,11 +25,11 @@ repo-maintainer/
 
 ## Usage
 
-Place this folder in your Kimi skills directory:
+Place this folder in your Agent skills directory:
 - Windows: ~/.kimi/skills/repo-maintainer/
 - Linux/macOS: ~/.config/agents/skills/repo-maintainer/
 
-Then trigger it by saying things like:
+Trigger phrases include:
 - "整理我的 GitHub 仓库"
 - "统一所有仓库的 README"
 - "合并相关仓库"
