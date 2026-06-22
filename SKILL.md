@@ -119,14 +119,23 @@ When the user downloads code locally, makes heavy changes (file renames, variabl
 
 **推送前必须先扫描 secret 泄露，有任何发现立即报告，禁止继续 push。**
 
-扫描模式：
+扫描模式（**两道都要跑**——只跑 token 正则会漏掉明文密码）：
 
+**① 高熵 token / API key：**
 ```bash
 grep -rn "sk-[A-Za-z0-9]\{20,\}\|ghp_[A-Za-z0-9]\{36\}\|ghu_\|github_pat_\|Bearer [A-Za-z0-9+/=]\{40,\}" \
   --include="*.py" --include="*.js" --include="*.ts" --include="*.yaml" \
   --include="*.env" --include="*.json" --include="*.bat" --include="*.sh" \
   --exclude-dir=".git" .
 ```
+
+**② 明文密码 / 凭证 helper**（token 正则抓不到；实战曾漏掉 `askpass.sh` 里一行 `echo "<sudo密码>"`，随 init commit 推上了 GitHub）：
+```bash
+git ls-files -z | xargs -0 grep -nIE "password|passwd|密码|SUDO_ASKPASS|sshpass|^[[:space:]]*echo[[:space:]]+[\"'][^\"']{6,}[\"']" 2>/dev/null \
+  | grep -vE "\.md:|getenv|getpass|placeholder|example"
+# 并人工核对孤立的 askpass.sh / *_secret* / .pgpass / .npmrc 类文件——它们整文件就是凭证
+```
+任一道命中即按下方强制流程处理。注意扫的是 `git ls-files`（已跟踪集），`.gitignore` 挡掉的不算泄露，但**已 commit 的文件即使现在 gitignore 也仍在历史里**。
 
 报告格式：
 ```
@@ -256,6 +265,7 @@ If history is broken (shows file as brand new), the rename and content change we
 
 ## Security & Compliance
 
+- **GitHub token**: 需要 PAT 时在 agent 记忆里找（不在此写具体路径/账号/值）。**绝不把 token 值写进任何会被 push 的文件**（含本 skill、README、配置）——含 token 的内容一旦 push 即被 GitHub secret-scanning 吊销。
 - **Token hygiene**: After bulk operations, instruct user to revoke the PAT immediately at `https://github.com/settings/tokens`.
 - **Secret history**: If a repo ever committed API keys, deleting the repo is the only way to purge history from GitHub. Force-pushing sanitized history does not guarantee removal from GitHub's backup systems.
 - **Archived repos with secrets**: If deletion is unacceptable, at minimum remove the repo from public visibility (make private) or delete and recreate empty with clean code.
