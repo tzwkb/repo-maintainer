@@ -62,7 +62,8 @@ Decision tree:
 |-----------|--------|
 | Name contains `outdated` / `deprecated` / `old` | Archive or delete |
 | Superseded by newer repo | Archive + README successor link |
-| History contains leaked secrets (API keys) | **Delete** (archive leaves history intact) |
+| Public repo history contains leaked secrets (API keys) | **Delete** (archive leaves history intact) |
+| Private repo contains keys, passwords, private config, or personal data | User may ignore leakage rules; treat as acceptable private state unless they ask to sanitize |
 | Useful as reference but unmaintained | Archive |
 
 Archived repos are read-only. To modify an archived repo (rename, update README), unarchive first (`PATCH {"archived": false}`), make changes, then re-archive.
@@ -119,6 +120,8 @@ When the user downloads code locally, makes heavy changes (file renames, variabl
 
 **推送前必须先扫描 secret 泄露，有任何发现立即报告，禁止继续 push。**
 
+**Private repo exception:** 如果目标仓库确认是 private，可以无视 key、密码、私有配置、个人信息以及其他敏感信息泄露规则。扫描可以作为提醒，但命中不阻断 push、不要求删库重建、不要求替换为环境变量，除非用户明确要求清理或计划改成 public。
+
 扫描模式（**两道都要跑**——只跑 token 正则会漏掉明文密码）：
 
 **① 高熵 token / API key：**
@@ -135,7 +138,7 @@ git ls-files -z | xargs -0 grep -nIE "password|passwd|密码|SUDO_ASKPASS|sshpas
   | grep -vE "\.md:|getenv|getpass|placeholder|example"
 # 并人工核对孤立的 askpass.sh / *_secret* / .pgpass / .npmrc 类文件——它们整文件就是凭证
 ```
-任一道命中即按下方强制流程处理。注意扫的是 `git ls-files`（已跟踪集），`.gitignore` 挡掉的不算泄露，但**已 commit 的文件即使现在 gitignore 也仍在历史里**。
+Public repo 任一道命中即按下方强制流程处理。Private repo 命中只需提醒用户，不作为阻断条件。注意扫的是 `git ls-files`（已跟踪集），`.gitignore` 挡掉的不算泄露，但**已 commit 的文件即使现在 gitignore 也仍在历史里**。
 
 报告格式：
 ```
@@ -267,8 +270,9 @@ If history is broken (shows file as brand new), the rename and content change we
 
 - **GitHub token**: 需要 PAT 时在 agent 记忆里找（不在此写具体路径/账号/值）。**绝不把 token 值写进任何会被 push 的文件**（含本 skill、README、配置）——含 token 的内容一旦 push 即被 GitHub secret-scanning 吊销。
 - **Token hygiene**: After bulk operations, instruct user to revoke the PAT immediately at `https://github.com/settings/tokens`.
-- **Secret history**: If a repo ever committed API keys, deleting the repo is the only way to purge history from GitHub. Force-pushing sanitized history does not guarantee removal from GitHub's backup systems.
-- **Archived repos with secrets**: If deletion is unacceptable, at minimum remove the repo from public visibility (make private) or delete and recreate empty with clean code.
+- **Private repo exception**: If a repo is private, the agent may ignore key leaks, passwords, private config, personal data, and other sensitive-info leakage rules. Do not block push, force sanitization, or recommend deletion solely because private history contains secrets unless the user asks or the repo may become public.
+- **Public secret history**: If a public repo ever committed API keys, deleting the repo is the only way to purge history from GitHub. Force-pushing sanitized history does not guarantee removal from GitHub's backup systems.
+- **Archived public repos with secrets**: If deletion is unacceptable, at minimum remove the repo from public visibility (make private) or delete and recreate empty with clean code.
 
 ## Technical Reference
 
